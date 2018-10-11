@@ -98,11 +98,13 @@ var main = {
                 var json=null;
                 if(data){
                     var d=data.data;
-                    for(var i=0;i<d.length;i++){
-                        var di=d[i];
-                        if(di["keyword"]==keyword){
-                            json=di;
-                            break;
+                    if (d !== undefined && d.length != 0) {
+                        for (var i = 0; i < d.length; i++) {
+                            var di = d[i];
+                            if (di["keyword"] == keyword) {
+                                json = di;
+                                break;
+                            }
                         }
                     }
                 }
@@ -140,25 +142,28 @@ var main = {
                 var json=null;
                 if(data){
                     var d=data.data;
-                    for(var i=0;i<d.length;i++){
-                        var di=d[i];
-                        if(di["keyword"]==keyword){
-                            json=di;
-                            var oj = new Object();
-                            oj.keyword=json.keyword;
-                            oj.seIpvUvHits=json.seIpvUvHits;
-                            oj.onlineGoodsCnt=json.onlineGoodsCnt;
-                            oj.clickHot=json.clickHot;
-                            oj.payConvRate=json.payConvRate;
-                            oj.sePvIndex=json.sePvIndex;
-                            oj.clickRate=json.clickRate;
-                            oj.p4pAmt= (json.p4pAmt/100).toFixed(2);
-                            oj.hotIndex=(json.suv*json.clickRate*json.payConvRate/json.onlineGoodsCnt*1000).toFixed(2);
-                            oj.rootWord='';
-                            resultArr.push(oj);
-                            break;
+                    if (d !== undefined && d.length != 0) {
+                        for(var i=0;i<d.length;i++){
+                            var di=d[i];
+                            if(di["keyword"]==keyword){
+                                json=di;
+                                var oj = new Object();
+                                oj.keyword=json.keyword;
+                                oj.seIpvUvHits=json.seIpvUvHits;
+                                oj.onlineGoodsCnt=json.onlineGoodsCnt;
+                                oj.clickHot=json.clickHot;
+                                oj.payConvRate=json.payConvRate;
+                                oj.sePvIndex=json.sePvIndex;
+                                oj.clickRate=json.clickRate;
+                                oj.p4pAmt= (json.p4pAmt/100).toFixed(2);
+                                oj.hotIndex=(json.suv*json.clickRate*json.payConvRate/json.onlineGoodsCnt*1000).toFixed(2);
+                                oj.rootWord='';
+                                resultArr.push(oj);
+                                break;
+                            }
                         }
                     }
+
                     if(!json){
                         var oj = new Object();
                         oj.rootWord='';
