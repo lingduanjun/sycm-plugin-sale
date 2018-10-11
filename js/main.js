@@ -15,7 +15,7 @@ var main = {
             // $("<p>自动查词插件V0.1</p><button id='flag_btn'></button>是否自动运行<p id='jobstart_status'></p><button id='test_btn'></button>").insertBefore($("#mainTable"));
 
 
-            $("<div id='tool_form'><p>自动查词插件V0.2</p><p>终端：<select id=\"device\">\n" +
+            $("<div id='tool_form'><p>自动查词插件V0.3</p><p>终端：<select id=\"device\">\n" +
                 "            <option value=\"0\" >所有</option>\n" +
                 "            <option value=\"1\" >PC</option>\n" +
                 "            <option value=\"2\" >无线</option>\n" +
@@ -34,7 +34,7 @@ var main = {
         }
     },
 
-    search:function(token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone){
+    search:function(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone){
         var _this=this;
         if(keywords.length<=0&&keywordsAll.length>0){
             doSome='noRoot';
@@ -80,7 +80,7 @@ var main = {
         var yestoday=new Date(new Date().getTime()-24*3600*1000);
         keyword = keyword.trim();
         if(!keyword ||keyword.length<=0){
-            return this.search(token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
+            return this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
         }
 
         var  date=getDateFormatStr(yestoday);
@@ -92,13 +92,13 @@ var main = {
            // token:token,
             _:new Date().getTime()
         }
-
         var process=function(data, textStatus){
             if((keywordsAll==null||!keywordsAll)&&doSome==''){//只有查词的时候处理方式
                 var json=null;
                 if(data){
                     var d=data.data;
                     if (d !== undefined && d.length != 0) {
+                        reTryNum=0;
                         for (var i = 0; i < d.length; i++) {
                             var di = d[i];
                             if (di["keyword"] == keyword) {
@@ -106,38 +106,32 @@ var main = {
                                 break;
                             }
                         }
+                       //todo
+                        main.show(json,keyword);
+                        var delay=1000+Math.floor( Math.random()*3000)
+                        setTimeout(function(){
+                            _this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
+                        },delay);
+
+                        console.log("关键词："+keyword+" 完成，等待 "+delay+"ms 继续查询下一个词");
+                    }else {
+                        //没查到数据需要重试
+                        reTryNum++;
+                        if(reTryNum<4){
+                            keywords.unshift(keyword);
+                            _this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
+                        }else {
+                            main.show(json,keyword);
+                            keywords.shift();
+                            var delay=1000+Math.floor( Math.random()*3000)
+                            setTimeout(function(){
+                                _this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
+                            },delay);
+                        }
+
                     }
                 }
-                if (!json) {
-                    json = {keyword: keyword, seIpvUvHits: "0", onlineGoodsCnt: "0", clickHot: "0", payConvRate: "0", sePvIndex: "0", clickRate: "0", p4pAmt: "0", hotIndex: "0"}
-                }
 
-                var tpl = "<tr>" +
-                    "<td>$keyword</td><td>$seIpvUvHits</td>" +
-                    "<td>$onlineGoodsCnt</td>" +
-                    "<td>$clickHot</td><td>$payConvRate</td>" +
-                    "<td>$sePvIndex</td><td>$clickRate</td>" +
-                    "<td>$p4pAmt</td><td>$hotIndex</td>" +
-                    "</tr>";
-
-                var tr = tpl;
-                for (var key in json) {
-                    if(key=="p4pAmt"){
-                        tr = tr.replace("$" + key, (json[key]/100).toFixed(2));
-                    }
-                    tr = tr.replace("$" + key, json[key]);
-                }
-                tr= tr.replace("$hotIndex",(json.seIpvUvHits*json.clickRate*json.payConvRate/json.onlineGoodsCnt*1000).toFixed(2));
-                tr=tr.replace("$seIpvUvHits",0).replace("$onlineGoodsCnt",0).replace("$clickHot",0).replace("$payConvRate",0).replace("$sePvIndex",0).replace("$clickRate",0).replace("$p4pAmt",0).replace("NaN",0);
-                $("#res").hide();
-                $("#resChaci").show();
-                $("#resChaci tbody").append(tr);
-                var delay=1000+Math.floor( Math.random()*3000)
-                setTimeout(function(){
-                    _this.search(token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
-                },delay);
-
-                console.log("关键词："+keyword+" 完成，等待 "+delay+"ms 继续查询下一个词");
             }else if(doSome=='noRoot'){//处理没有匹配上的关联词
                 var json=null;
                 if(data){
@@ -181,7 +175,7 @@ var main = {
                 }
                 var delay=1000+Math.floor( Math.random()*3000)
                 setTimeout(function(){
-                    _this.search(token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
+                    _this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
                 },delay);
 
                 console.log("关键词："+keyword+" 完成，等待 "+delay+"ms 继续查询下一个词");
@@ -222,7 +216,7 @@ var main = {
                         }
                         var delay=1000+Math.floor( Math.random()*3000)
                         setTimeout(function(){
-                            _this.search(token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
+                            _this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,whenDone);
                         },delay);
                         console.log("关键词："+keyword+" 完成，等待 "+delay+"ms 继续查询下一个词");
                     }else {
@@ -242,7 +236,7 @@ var main = {
                         }
                         var delay = 1000;
                         setTimeout(function () {
-                            _this.search(token, keywords, keywordsAll, resultArr, doSome, tempArr, device, whenDone);
+                            _this.search(reTryNum,token, keywords, keywordsAll, resultArr, doSome, tempArr, device, whenDone);
                         }, delay);
                         console.log("关键词词根没结果的：" + keyword + " 完成，等待 " + delay + "ms 继续查询下一个词");
                     }
@@ -264,7 +258,7 @@ var main = {
                     }
                     var delay = 1000;
                     setTimeout(function () {
-                        _this.search(token, keywords, keywordsAll, resultArr, doSome, tempArr, device, whenDone);
+                        _this.search(reTryNum,token, keywords, keywordsAll, resultArr, doSome, tempArr, device, whenDone);
                     }, delay);
                     console.log("出錯的关键词：" + keyword + " 完成，等待 " + delay + "ms 继续查询下一个词");
                 }
@@ -283,6 +277,7 @@ var main = {
         })
     },
     gogogo:function(){
+        var reTryNum=0;
         var device=$("#device").val();
         var keywords=$("#keywords").val();//词根
         var keywordsAll=$("#keywordsAll").val();//关键词列表
@@ -319,11 +314,39 @@ var main = {
              //定义一个对象数组,用来存放结果对象
              var resultArr=[];
             var doSome='';
-            this.search(token,keywords,keywordsAll,resultArr,doSome,tempArr,device,function(keywords){
+            this.search(reTryNum,token,keywords,keywordsAll,resultArr,doSome,tempArr,device,function(keywords){
                 console.log('完成');
                 $("#gogogo").val("查询完成")
                 document.getElementById("gogogo").disabled=false;
             })
+    },
+    show:function (json,keyword) {
+
+            if (!json) {
+                json = {keyword: keyword, seIpvUvHits: "0", onlineGoodsCnt: "0", clickHot: "0", payConvRate: "0", sePvIndex: "0", clickRate: "0", p4pAmt: "0", hotIndex: "0"}
+            }
+
+            var tpl = "<tr>" +
+                "<td>$keyword</td><td>$seIpvUvHits</td>" +
+                "<td>$onlineGoodsCnt</td>" +
+                "<td>$clickHot</td><td>$payConvRate</td>" +
+                "<td>$sePvIndex</td><td>$clickRate</td>" +
+                "<td>$p4pAmt</td><td>$hotIndex</td>" +
+                "</tr>";
+
+            var tr = tpl;
+            for (var key in json) {
+                if(key=="p4pAmt"){
+                    tr = tr.replace("$" + key, (json[key]/100).toFixed(2));
+                }
+                tr = tr.replace("$" + key, json[key]);
+            }
+            tr= tr.replace("$hotIndex",(json.seIpvUvHits*json.clickRate*json.payConvRate/json.onlineGoodsCnt*1000).toFixed(2));
+            tr=tr.replace("$seIpvUvHits",0).replace("$onlineGoodsCnt",0).replace("$clickHot",0).replace("$payConvRate",0).replace("$sePvIndex",0).replace("$clickRate",0).replace("$p4pAmt",0).replace("NaN",0);
+            $("#res").hide();
+            $("#resChaci").show();
+            $("#resChaci tbody").append(tr);
+
     }
 
 };
