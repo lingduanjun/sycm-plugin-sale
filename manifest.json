@@ -1,8 +1,8 @@
 {
 
-    "name": "生意参谋自动查词工具-新",
+    "name": "生意参谋自动查词工具-销售部",
     "manifest_version": 2,
-    "version": "1.0.0",
+    "version": "2.0.0",
     "homepage_url": "http://www.chapaiming.com/",
     "description": "生意参谋自动查词工具-新",
     "permissions": ["cookies", "contextMenus", "tabs", "http://*/*", "https://*/*"],
@@ -23,7 +23,7 @@
                 "matches": [
                     "*://sycm.taobao.com/*"
                 ],
-                "js": ["js/libs/jquery-1.11.2.min.js","js/libs/jsrender.js","js/libs/md5.min.js","js/libs/bluebird.min.js","js/libs/dexie.js", "js/utils.js", "js/contentscript.js","js/main.js","js/libs/socket.io.js"],
+                "js": ["js/libs/jquery-1.11.2.min.js","js/libs/jsrender.js","js/libs/md5.min.js","js/libs/bluebird.min.js","js/libs/dexie.js","js/libs/crypto-js.js", "js/utils.js", "js/contentscript.js","js/main.js","js/libs/socket.io.js"],
                 "css":["css/extension.css"]
             }
     ]

@@ -92,11 +92,33 @@ var main = {
            // token:token,
             _:new Date().getTime()
         }
+
+
+          var depect=function(data){
+			var s = "sycmsycmsycmsycm"
+			  , l = CryptoJS.enc.Utf8.parse(s)
+			  , u = {
+				iv: CryptoJS.enc.Utf8.parse("mcysmcysmcysmcys"),
+				mode: CryptoJS.mode.CBC,
+				padding: CryptoJS.pad.Pkcs7
+			}
+
+				n = JSON.parse(CryptoJS.AES.decrypt(function(e) {
+                    return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(e))
+                }(data), l, u).toString(CryptoJS.enc.Utf8))
+
+			return n;
+		}
+
+
+
+
         var process=function(data, textStatus){
+			var data = depect(data.data);
             if((keywordsAll==null||!keywordsAll)&&doSome==''){//只有查词的时候处理方式
                 var json=null;
                 if(data){
-                    var d=data.data;
+                    var d=data;
                     if (d !== undefined && d.length != 0) {
                         reTryNum=0;
                         for (var i = 0; i < d.length; i++) {
@@ -135,7 +157,7 @@ var main = {
             }else if(doSome=='noRoot'){//处理没有匹配上的关联词
                 var json=null;
                 if(data){
-                    var d=data.data;
+                    var d=data;
                     if (d !== undefined && d.length != 0) {
                         for(var i=0;i<d.length;i++){
                             var di=d[i];
@@ -183,7 +205,7 @@ var main = {
                 //同时查关联词时的处理方式
                 var backArr=[];
                 if(data){
-                    var d=data.data;
+                    var d=data;
                     if (d !== undefined && d.length != 0) {
                         for(var i=0;i<d.length;i++){
                             var di=d[i];
@@ -269,6 +291,9 @@ var main = {
         $.ajax({
             url:"https://sycm.taobao.com/mc/searchword/relatedWord.json",
             type:"GET",
+			headers: {
+			"Transit-Id": "ZvHhfIGqaAnTaLCFFx6yZnHCQOB/adNPdfqNm8ldtUmYsLF9I/cSxmXgi+0fTfyodQQUcPhhvrw3M6oM/0xJYaHWsR/IVShu7auA/LdUpalRFIQLku8aFokepjO0G+zbFkBRKK+ys6jV/g1L/E7HTjADbSgPMRhdsV30gmO+SA4="
+			},
             timeout:30000,
             data:params,
             dataType:"json",
