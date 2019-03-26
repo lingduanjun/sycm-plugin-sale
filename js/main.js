@@ -211,8 +211,6 @@ var main = {
                             var di=d[i];
                             backArr.push(di["keyword"]);
                         }
-                        console.log("设定的相关词："+keywordsAll);
-                        console.log("获取的相关词："+backArr);
                         for (var i=0;i<keywordsAll.length;i++) {
                             var json=null;
                             for(var j=0;j<d.length;j++){
